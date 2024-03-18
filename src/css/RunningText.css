@@ -1,0 +1,25 @@
+/* Define running text animation */
+@keyframes run {
+    from { transform: translateX(100%); } /* Start position */
+    to { transform: translateX(0%); } /* End position */
+  }
+  
+  /* Apply animation to running text */
+  .running-text {
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: ellipsis; /* Hide overflowing text */
+    animation: run 5s linear infinite; /* Adjust duration as needed */
+  }
+  
+
+  
+  .text-overflow {
+    width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+   text-overflow: ellipsis; 
+   cursor:pointer;
+  }
+  
+
+  /*${album.title.length < 30 ? 'text-nowrap' : 'running-text'}*/

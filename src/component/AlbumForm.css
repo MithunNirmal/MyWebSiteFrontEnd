@@ -1,0 +1,44 @@
+.album-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.album-form {
+  background-color: #f7f7f7;
+  padding: 15px;
+  border-radius: 5px;
+  width: 500px;
+  margin-right: 20px;
+  height: 70%;
+}
+
+.songs-container {
+  max-height: 450px; /* Adjust the max height of the songs container */
+  overflow-y: auto;
+}
+
+.song-form {
+  background-color: #f7f7f7;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  margin-left: 50px;
+  width: 500px;
+  
+}
+
+.song-form h5 {
+  margin-bottom: 50px;
+}
+
+.small {
+  font-size: 12px;
+  padding: 12px 36px;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.8em; /* Adjust the font size as needed */
+}
