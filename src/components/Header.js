@@ -1,14 +1,15 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
-import bag from "../files/bag.png";
+import UrlContext from "../contexts/UrlContext";
+import { Navbar } from "react-bootstrap";
 
 const Header = () => {
-//  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const {name, isLoggedOn, login, token, logout} = useContext(UserContext);
+  const {userName, isLoggedOn, userId, login, token, logout} = useContext(UserContext);
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
+  var isNavColl = true;
   const navbarRef = useRef(null);
-  
+  const url = useContext(UrlContext);
 
   const handleNavCollapse = () => {
     console.log("handleNavCollapse called");
@@ -16,9 +17,10 @@ const Header = () => {
   }
  
   const handleOutsideClick = (event) => {
+    console.log("handle nav outside");
     if (navbarRef.current && !navbarRef.current.contains(event.target)) {
       setIsNavCollapsed(true);
-    }
+   }
   };
 
   useEffect(() => {      
@@ -28,25 +30,9 @@ const Header = () => {
     };
   }, [isNavCollapsed]);
 
-  useEffect(() => {
-    // Function to retrieve user information from local storage
-    const getUserFromLocalStorage = () => {
-      const storedUserInformation = localStorage.getItem("userDetails");
-      if (storedUserInformation) {
-        const userDetails = JSON.parse(storedUserInformation);
-        //console.log(userDetails.name);
-        login(userDetails.isLoggedOn, userDetails.name, userDetails.token)
-        console.log("wfkedhfsdhf " + name);
-      }
-    };
-    // Call the function when the component mounts
-    getUserFromLocalStorage();
-  }, [name, isLoggedOn, token]);
-
 
   const handleLogout = () => {
-
-    fetch("http://localhost:8080/api/v1/auth/logout", {
+    fetch(url.domain + "/api/v1/auth/logout", {
       method: "GET",
       headers: {
         Authorization: "Bearer " + localStorage.getItem("jwt"), // Append the token to the Authorization header
@@ -56,7 +42,7 @@ const Header = () => {
     .then((response)=> 
     {
       if (response.status == 200){
-        localStorage.removeItem("user");
+        localStorage.removeItem("userDetails");
         localStorage.clear();
         logout();
       }
@@ -68,7 +54,7 @@ const Header = () => {
   return (
     <header className="header bg-dark py-2 fixed-top">
       <div className="container">
-        <nav className="navbar navbar-expand-lg navbar-dark">
+        <Navbar className="navbar navbar-expand-lg navbar-dark">
           <div className="container-fluid" ref={navbarRef}>
             <Link to="/" className="navbar-brand mb-0 h1">
                     Mithun Nirmal
@@ -79,15 +65,15 @@ const Header = () => {
               data-bs-toggle="collapse"
               data-bs-target="#navbarNav"
               aria-controls="navbarNav"
-              aria-expanded={!isNavCollapsed ? true : false}
+            //  aria-expanded={!isNavCollapsed ? true : false}
               aria-label="Toggle navigation"
-              onClick={handleNavCollapse}
+            //  onClick={handleNavCollapse}
             >
               <span className="navbar-toggler-icon"></span>
             </button>
             <div className={`${isNavCollapsed ? "collapse" : ""} navbar-collapse`} id="navbarNav">
-              <ul className="navbar-nav ms-auto">
-                <li className="nav-item" >
+              <ul className="navbar-nav ms-auto" onClick={handleNavCollapse}>
+                <li className="nav-item">
                   <Link to="/" className="nav-link">
                     Home
                   </Link>
@@ -110,14 +96,14 @@ const Header = () => {
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
                     >
-                      {name}
+                      {userName}
                     </button>
                     <ul
                       className="dropdown-menu"
                       aria-labelledby="navbarDropdown"
                     >
                       <li >
-                        <Link to="/profile" className="dropdown-item" >
+                        <Link to={`/profile/${userId}`} className="dropdown-item" >
                           Profile 
                         </Link>
                       </li>
@@ -165,7 +151,7 @@ const Header = () => {
               </ul>
             </div>
           </div>
-        </nav>
+        </Navbar>
       </div>
     </header>
   );

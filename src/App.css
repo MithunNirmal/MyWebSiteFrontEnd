@@ -28,3 +28,7 @@
 .social-link:hover {
   color: #007bff; /* Color of the icons on hover */
 }
+
+.blur-backgroud {
+  backdropFilter: blur(5px);
+}

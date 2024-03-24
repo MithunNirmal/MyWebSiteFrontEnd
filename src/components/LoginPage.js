@@ -3,17 +3,17 @@ import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
 import backgroundImage from "../files/bgm.jpg";
+import UrlContext from "../contexts/UrlContext";
 
 const LoginPage = () => {
-  const [jwToken, setJwToken] = useState(null);
-  const {login, token, user}  = useContext(UserContext);
+  const {login, token, userName, isLoggedOn}  = useContext(UserContext);
+  const url = useContext(UrlContext);
 
   const navigate = useNavigate();
 
-
   useEffect(() => {
-    console.log(user);
-    user ? navigate("/") : console.log(user);
+    console.log(userName);
+    isLoggedOn ? navigate("/") : console.log(userName);
   }, []);
 
   const [formData, setFormData] = useState({
@@ -45,7 +45,7 @@ const LoginPage = () => {
 
     if (valid) {
       console.log("Calling authenticate fetch now");
-      fetch("http://192.168.1.100:8080/api/v1/auth/authenticate", {
+      fetch(url.domain+"/api/v1/auth/authenticate", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -70,20 +70,18 @@ const LoginPage = () => {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
-        setJwToken(data);
-        console.log(jwToken);
-        console.log(jwToken.access_token);
-        login(true, "Mithun", jwToken.access_token);
+        console.log(data);        
+        console.log(data.access_token);
+        login(true, data.user_name, data.access_token, data.user_id);
         localStorage.setItem("userDetails", JSON.stringify({
           isLoggedOn: true,
-          name: "Mithun",
-          token: jwToken.access_token
+          userName: data.user_name,
+          token: data.access_token,
+          userId: data.user_id,
         }));
-        localStorage.setItem("jwt", jwToken.access_token);
+        localStorage.setItem("jwt", data.access_token);
         console.log("Login successful!");
         navigate("/");
-        console.log("token -> " +token);
       })
       .catch((error) => {
         // setErrors({
@@ -111,7 +109,7 @@ const LoginPage = () => {
     >
       <div className="row justify-content-center" >
         <div className="col-lg-6">
-          <div className="card bg-dark text-light">
+          <div className="card" style={{backgroundColor : "rgba(255,255,255,0.8)", borderRadius:"30px"}}>
             <div className="card-body">
               <h2 className="text-center mb-4">Login</h2>
               <form onSubmit={handleLoginSubmit}>
@@ -152,7 +150,7 @@ const LoginPage = () => {
                 <div className="text-center mt-5">
                   <button
                     type="submit"
-                    className="btn btn-light btn-block btn-lg"
+                    className="btn btn-dark btn-block btn-lg"
                   >
                     Login
                   </button>
@@ -161,7 +159,7 @@ const LoginPage = () => {
               <div className="text-center mt-4">
                 <p>
                   Don't have an account?{" "}
-                  <Link to="/signup" className="btn btn-link text-light">
+                  <Link to="/signup" className="btn btn-link">
                     Sign Up
                   </Link>
                 </p>

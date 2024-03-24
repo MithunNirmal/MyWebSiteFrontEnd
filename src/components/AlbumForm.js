@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
-import './AlbumForm.css'; // Import custom CSS file
+import React, { useContext, useState } from 'react';
+import '../css/AlbumForm.css'; // Import custom CSS file
+import UrlContext from '../contexts/UrlContext';
 
 const AlbumForm = () => {
+  const urlDomain = useContext(UrlContext);
   const [albumDetails, setAlbumDetails] = useState({
     name: '',
     coverLink: '',
     primaryArtist: '',
+    type:'',
     link: '',
     songs: []
   });
@@ -56,7 +59,7 @@ const AlbumForm = () => {
       } else {
         console.log('Album details:', albumDetails);
         // Your code to submit album details to the backend goes here
-        fetch("http://localhost:8080/api/v1/album/addAlbumWithGDriveLink", {
+        fetch(urlDomain+"/api/v1/album/admin/addAlbumWithGDriveLink", {
         method : "POST",
         headers: {
           Accept: "application/json",
@@ -65,8 +68,17 @@ const AlbumForm = () => {
         body: JSON.stringify(albumDetails)
       })
       .then((response) => {
-        if(response.status == 200)
-          console.log("posted successfully")
+        if(response.status === 200) {
+          console.log("posted successfully");
+          alert("Posted successfully");
+          setAlbumDetails({
+            name: '',
+            coverLink: '',
+            primaryArtist: '',
+            link: '',
+            songs: []
+          });
+        }
         else
         console.log("response status" + response.status);
       })
@@ -99,6 +111,13 @@ const AlbumForm = () => {
     }
     if (!albumDetails.link) {
       errors.link = 'Album link is required';
+    }
+    if(!albumDetails.type) {
+      errors.type = "Type is required";
+    }
+    else if( albumDetails.type !== "SINGLE" && albumDetails.type !== "ALBUM" &&
+    albumDetails.type != "EP" & albumDetails.type != "LP" ){
+          errors.type = "Invalid type";
     }
     albumDetails.songs.forEach((song, index) => {
       if (!song.name) {
@@ -148,6 +167,11 @@ const AlbumForm = () => {
               <label htmlFor="link" className="form-label">Album Link<span className="required">*</span>:</label>
               <input type="text" className="form-control small" id="link" name="link" value={albumDetails.link} onChange={handleAlbumChange} />
               {errors.link && <p className="error-message">{errors.link}</p>}
+            </div>
+            <div className="form-group">
+              <label htmlFor="type" className="form-label">Type<span className="required">*</span>:</label>
+              <input type="text" className="form-control small" id="type" name="type" value={albumDetails.type} onChange={handleAlbumChange} />
+              {errors.type && <p className="error-message">{errors.type}</p>}
             </div>
             <button type="submit" style= {{marginTop: "40px"}} className="btn btn-success btn">Submit Album</button>
           </form>

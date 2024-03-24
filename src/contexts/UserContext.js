@@ -1,27 +1,41 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 
 const UserContext = React.createContext(null);
 
-
 const UserProvider = ({ children }) => {
 		const [isLoggedOn, setIsLoggedIn] = useState(false);
-		const [name, setUser] = useState(null);
+		const [userName, setUserName] = useState(null);
 		const [token, setToken] = useState(null);
+		const [userId, setUserId] = useState(null);
 
-		const login = (isLoggenOnData, userName, tokenData) => {
+		useEffect(() => {
+			const getUserFromLocalStorage = () => {
+				const storedUserInformation = localStorage.getItem("userDetails");
+				if (storedUserInformation) {
+				  const userDetails = JSON.parse(storedUserInformation);
+				  login(userDetails.isLoggedOn, userDetails.userName, userDetails.token, userDetails.userId);
+				}
+			  };
+			  // Call the function when the component mounts
+			  getUserFromLocalStorage();
+		}, [userName, isLoggedOn, token]);
+
+		const login = (isLoggenOnData, userName, tokenData, userId) => {
 			setIsLoggedIn(isLoggenOnData)  
-			setUser(userName);
-			setToken(tokenData)
+			setUserName(userName);
+			setToken(tokenData);
+			setUserId(userId);
 		};
 
 		const logout = () => {
-			setIsLoggedIn(false)  
-			setUser(null);
-			setToken()
+			setIsLoggedIn(false) ; 
+			setUserName(null);
+			setToken(null);
+			setUserId(null);
 		};
 
 		return (
-			<UserContext.Provider value={{ name, isLoggedOn, token, login, logout }}>
+			<UserContext.Provider value={{ userName, isLoggedOn, token, userId, login, logout }}>
 				{children}
 			</UserContext.Provider>
 		)

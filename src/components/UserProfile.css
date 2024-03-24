@@ -1,0 +1,81 @@
+.user-profile {
+  display: flex;
+  padding: 5%;
+}
+
+.left-panel, .right-panel {
+  flex: 1;
+  padding: 20px;
+}
+
+.left-panel {
+  max-width: 30%;
+  background-color: #f0f0f0;
+}
+
+.right-panel {
+  background-color: #ffffff;
+}
+
+h2 {
+  margin-bottom: 10px;
+}
+
+.profile-actions {
+  list-style: none;
+  padding: 0;
+  text-align: right;
+}
+
+ul:hover {
+  color: grey;
+}
+
+li {
+  cursor: pointer;
+  padding: 5px 0;
+}
+li:hover {
+  color: blue;
+}
+
+.user-info {
+  margin-top: 20px;
+}
+
+.status {
+  font-weight: bold;
+}
+
+.enabled {
+  color: green;
+  text-shadow: 0 0 1.2px green
+}
+
+.disabled {
+  color: red;
+  text-shadow: 0 0 1.5px red
+}
+
+@media (max-width: 768px)  {
+  .user-profile {
+    display: flex;
+    flex-direction: column; /* Stack the panels vertically */
+    padding: 5%;
+  }
+  
+  .left-panel, .right-panel {
+    padding: 20px;
+  }
+  
+  .left-panel {
+    max-width: 100%;
+    background-color: #f0f0f0;
+    order: 2; /* Change the order to appear below the right panel */
+  }
+  
+  .right-panel {
+    background-color: #ffffff;
+    order: 1; /* Change the order to appear above the left panel */
+  }
+}

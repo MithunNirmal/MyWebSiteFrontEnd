@@ -4,21 +4,25 @@ google dirve download link
 
 
 
+const storedCart = localStorage.getItem("cart");
+    if (storedCart) {
+      setCart(JSON.parse(storedCart));
+    }
 
-fetch("http://localhost:8080/api/v1/album/addAlbumWithGDriveLink", {
-        method : "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(albumDetails)
-      })
-      .then((response) => {
-        if(response.status == 200)
-          console.log("posted successfully")
-        else
-        console.log("response status" + response.status);
-      })
-      .catch((error) => {
-        console.log("Error submitting album");
-      });
+
+useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
+
+  const addToCart = (item) => {
+    setCart([...cart, item]);
+  };
+
+
+          <button
+            className="btn btn-dark"
+            onClick={handleViewCart}
+          >
+            View Cart ({cart.length})
+          </button>
+
