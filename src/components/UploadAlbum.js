@@ -4,9 +4,6 @@ import '../css/AlbumForm.css'; // Assuming you have a similar CSS file for styli
 const UploadAlbum = () => {
   const [file, setFile] = useState(null);
   const [cover, setCover] = useState(null);
-  const [albumName, setAlbumName] = useState('');
-  const [primaryArtist, setPrimaryArtist] = useState('');
-  const [albumType, setAlbumType] = useState('');
   const [errors, setErrors] = useState({});
   const [uploadStatus, setUploadStatus] = useState('idle');
   const [uploadPercentage, setUploadPercentage] = useState(0);
@@ -29,7 +26,7 @@ const UploadAlbum = () => {
   };
 
   const handleUpload = async () => {
-    if (file && cover && albumName && primaryArtist && albumType) {
+    if (file && cover) {
       console.log('Uploading file...');
       setUploadStatus('uploading');
       abortController.current = new AbortController();
@@ -37,9 +34,6 @@ const UploadAlbum = () => {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('cover', cover);
-      formData.append('albumName', albumName);
-      formData.append('primaryArtist', primaryArtist);
-      formData.append('albumType', albumType);
 
       try {
         const result = await fetch('https://httpbin.org/post', {
@@ -54,12 +48,9 @@ const UploadAlbum = () => {
 
         const data = await result.json();
         console.log(data);
-        alert('File, cover, and album details uploaded successfully');
+        alert('File and cover uploaded successfully');
         setFile(null);
         setCover(null);
-        setAlbumName('');
-        setPrimaryArtist('');
-        setAlbumType('');
         setUploadStatus('success');
       } catch (error) {
         if (error.name === 'AbortError') {
@@ -72,7 +63,7 @@ const UploadAlbum = () => {
         setUploadStatus('error');
       }
     } else {
-      setErrors({ file: 'Please select a file, cover, and fill all album details' });
+      setErrors({ file: 'Please select both a file and a cover' });
       setUploadStatus('idle');
     }
   };
@@ -106,36 +97,6 @@ const UploadAlbum = () => {
       <div className="container-fluid d-flex justify-content-center align-items-center h-100">
         <div className="upload-form">
           <h2>Upload Album</h2>
-          <div className="form-group">
-            <label htmlFor="albumName" className="form-label">Album Name<span className="required">*</span>:</label>
-            <input
-              type="text"
-              className="form-control small"
-              id="albumName"
-              value={albumName}
-              onChange={(e) => setAlbumName(e.target.value)}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="primaryArtist" className="form-label">Primary Artist<span className="required">*</span>:</label>
-            <input
-              type="text"
-              className="form-control small"
-              id="primaryArtist"
-              value={primaryArtist}
-              onChange={(e) => setPrimaryArtist(e.target.value)}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="albumType" className="form-label">Album Type<span className="required">*</span>:</label>
-            <input
-              type="text"
-              className="form-control small"
-              id="albumType"
-              value={albumType}
-              onChange={(e) => setAlbumType(e.target.value)}
-            />
-          </div>
           <div className="form-group">
             <label htmlFor="file" className="form-label">Choose a file<span className="required">*</span>:</label>
             <input id="file" type="file" className="form-control small" onChange={handleFileChange} />
@@ -174,8 +135,8 @@ const UploadAlbum = () => {
               <p className="percentage">{uploadPercentage}%</p>
             </div>
           )}
-          {uploadStatus === 'success' && <p className="status-message success-message">File, cover, and album details uploaded successfully!</p>}
-          {uploadStatus === 'error' && <p className="status-message error-message">Failed to upload file, cover, and album details. Please try again.</p>}
+          {uploadStatus === 'success' && <p className="status-message success-message">File and cover uploaded successfully!</p>}
+          {uploadStatus === 'error' && <p className="status-message error-message">Failed to upload file and cover. Please try again.</p>}
         </div>
       </div>
     </div>

@@ -14,11 +14,15 @@ import AlbumForm from "./components/AlbumForm";
 import Album from "./components/album";
 import { CartProvider } from "./contexts/CartContext";
 import UserProfile from "./components/UserProfile";
+import { UrlProvider } from "./contexts/UrlContext";
+import PaymentPage from "./components/PaymentPage";
+import UploadAlbum from "./components/UploadAlbum";
 
 const App = () =>{
 
   return (
     <>
+    <UrlProvider>
       <UserProvider>
         <CartProvider>
         <Router>
@@ -34,7 +38,10 @@ const App = () =>{
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/album/:id" element={<Album />} />
                 <Route path="/albumForm" element={<AlbumForm />}/>
+                <Route path="/uploadAlbum" element={<UploadAlbum/>}/>
                 <Route path="/profile/:userId" element={<UserProfile/>}/>
+                <Route path="/makePayment" element={<PaymentPage/>}/>
+                
               </Routes>
             </div>
             <Footer />
@@ -42,6 +49,7 @@ const App = () =>{
         </Router>
         </CartProvider>
       </UserProvider>
+      </UrlProvider>
   </>
   );
 }

@@ -1,0 +1,9 @@
+.album-content {
+    text-align: left;
+}
+
+@media (max-width: 768px)  {
+    .album-content {
+        text-align: center;
+    }
+}

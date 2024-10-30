@@ -5,7 +5,7 @@ import Footer from "./Footer";
 import { Carousel } from "react-bootstrap";
 import { UserContext } from "../contexts/UserContext";
 import backgroundImage from "../files/bgm.jpg"; // Import the local image file
-import UrlContext from "../contexts/UrlContext";
+import { UrlContext } from "../contexts/UrlContext";
 import { CartContext } from "../contexts/CartContext";
 
 const MerchandisePage = () => {
@@ -13,11 +13,11 @@ const MerchandisePage = () => {
 //  const [cart, setCart] = useState([]);
   const {cart, addToCart} = useContext(CartContext);
   const navigate = useNavigate();
-  const url = useContext(UrlContext);
+  const { server } = useContext(UrlContext);
   const {token} = useContext(UserContext)
  
   useEffect(() => {
-    fetch(url.domain + "/api/v1/public/products", {
+    fetch(server + "/api/v1/public/products", {
       method: "GET",
       // headers: {
       //   Authorization: "Bearer " + localStorage.getItem("jwt"), // Append the token to the Authorization header
@@ -59,7 +59,7 @@ const MerchandisePage = () => {
       <div className="container mt-5">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="mb-0" style={{color: "white"}}>Merchandise</h2>
-          
+          <p className="text-warning">This page is under construction! Please don't add anything</p>
 
         </div>
         <div className="row row-cols-1 row-cols-md-4 g-4">

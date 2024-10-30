@@ -1,26 +1,35 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
-import UrlContext from "../contexts/UrlContext";
-import { Navbar } from "react-bootstrap";
+import { UrlContext } from "../contexts/UrlContext";
+import { NavDropdown, Navbar , Nav} from "react-bootstrap";
 
 const Header = () => {
   const {userName, isLoggedOn, userId, login, token, logout} = useContext(UserContext);
-  const [isNavCollapsed, setIsNavCollapsed] = useState(true);
-  var isNavColl = true;
+  //const [isNavCollapsed, setIsNavCollapsed] = useState(true);
   const navbarRef = useRef(null);
-  const url = useContext(UrlContext);
-
-  const handleNavCollapse = () => {
-    console.log("handleNavCollapse called");
-    setIsNavCollapsed(!isNavCollapsed);
-  }
+  const { server } = useContext(UrlContext);
+  const [expanded, setExpanded] = useState(false);
+  const navigate = useNavigate();
  
   const handleOutsideClick = (event) => {
-    console.log("handle nav outside");
-    if (navbarRef.current && !navbarRef.current.contains(event.target)) {
-      setIsNavCollapsed(true);
-   }
+     if (navbarRef.current && !navbarRef.current.contains(event.target)) {
+    //  setIsNavCollapsed(true);
+      setExpanded(false);
+    }
+  };
+
+  const handleNavCollapse = () => {
+    setExpanded(!expanded);
+  };
+
+  const handleDropDownClick = (event) => {
+    // Prevents the default action of the click event
+    event.preventDefault();
+    // Prevents the event from bubbling up the DOM tree
+    event.stopPropagation();
+    // Your custom logic here
+
   };
 
   useEffect(() => {      
@@ -28,11 +37,11 @@ const Header = () => {
     return () => {
      window.removeEventListener("click", handleOutsideClick);
     };
-  }, [isNavCollapsed]);
+  }, [expanded]);
 
 
   const handleLogout = () => {
-    fetch(url.domain + "/api/v1/auth/logout", {
+    fetch(server + "/api/v1/auth/logout", {
       method: "GET",
       headers: {
         Authorization: "Bearer " + localStorage.getItem("jwt"), // Append the token to the Authorization header
@@ -45,6 +54,7 @@ const Header = () => {
         localStorage.removeItem("userDetails");
         localStorage.clear();
         logout();
+        navigate("/");
       }
       else
         console.error("logout error " + response.status);
@@ -54,103 +64,56 @@ const Header = () => {
   return (
     <header className="header bg-dark py-2 fixed-top">
       <div className="container">
-        <Navbar className="navbar navbar-expand-lg navbar-dark">
-          <div className="container-fluid" ref={navbarRef}>
-            <Link to="/" className="navbar-brand mb-0 h1">
-                    Mithun Nirmal
-            </Link>
-            <button
-              className="navbar-toggler"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#navbarNav"
-              aria-controls="navbarNav"
-            //  aria-expanded={!isNavCollapsed ? true : false}
-              aria-label="Toggle navigation"
-            //  onClick={handleNavCollapse}
-            >
-              <span className="navbar-toggler-icon"></span>
-            </button>
-            <div className={`${isNavCollapsed ? "collapse" : ""} navbar-collapse`} id="navbarNav">
-              <ul className="navbar-nav ms-auto" onClick={handleNavCollapse}>
-                <li className="nav-item">
-                  <Link to="/" className="nav-link">
-                    Home
-                  </Link>
-                </li>
-                <li className="nav-item" >
-                  <Link to="/discography" className="nav-link" >
-                    Discography
-                  </Link>
-                </li>
-                <li className="nav-item" >
-                  <Link to="/merch" className="nav-link">
-                    Merchandise
-                  </Link>
-                </li>
-                {isLoggedOn ? (
-                  <li className="nav-item dropdown fw-bolder">
-                    <button
-                      className="nav-link btn btn-dark dropdown-toggle"
-                      id="navbarDropdown"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
-                      {userName}
-                    </button>
-                    <ul
-                      className="dropdown-menu"
-                      aria-labelledby="navbarDropdown"
-                    >
-                      <li >
-                        <Link to={`/profile/${userId}`} className="dropdown-item" >
-                          Profile 
-                        </Link>
-                      </li>
-                      <li  onClick={handleLogout} >
-                        <Link className="dropdown-item" >
-                          Logout
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-                ) : (
-                  <li className="nav-item dropdown">
-                    <button
-                      className="nav-link btn btn-dark dropdown-toggle"
-                      id="navbarDropdown"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
-                      Membership <small className="text-warning">free</small>
-                    </button>
-                    <ul
-                      className="dropdown-menu"
-                      aria-labelledby="navbarDropdown"
-                    >
-                      <li >
-                        <Link to="/login" className="dropdown-item">
-                          Login
-                        </Link>
-                      </li>
-                      <li >
-                        <Link to="/signup" className="dropdown-item">
-                          Sign Up
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-                )}
-                <li className="nav-item">
-                  <Link to="/cart" className="nav-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-bag" viewBox="0 0 20 20">
-                      <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"/>
-                    </svg>
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
+        <Navbar expand="lg" variant="dark" expanded={expanded} onToggle={handleNavCollapse} ref={navbarRef}>
+          <Navbar.Brand as={Link} to="/" style={{paddingLeft:"10px", width:"60px"}}>
+            <img src="/icon.jpeg" width="35px" height="35px" style={{borderRadius:"50%"}} className="d-inline-block align-top img-fluid"/>
+          </Navbar.Brand>
+          <Navbar.Brand as={Link} to="/" style={{textAlign:"right"}}>
+            Mithun Nirmal
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="ms-auto" onClick={handleNavCollapse}>
+              <Nav.Link as={Link} to="/">
+                Home
+              </Nav.Link>
+              <Nav.Link as={Link} to="/discography">
+                Discography
+              </Nav.Link>
+              <Nav.Link as={Link} to="/merch">
+                Merchandise
+              </Nav.Link>
+              {isLoggedOn ? (
+                <NavDropdown title={userName} id="navbar-dropdown" onClick={handleDropDownClick}>
+                  <NavDropdown.Item as={Link} to={`/profile/${userId}`}>
+                    Profile
+                  </NavDropdown.Item>
+                  <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
+                </NavDropdown>
+              ) : (
+                <NavDropdown title={<span>Membership <small className="text-warning">free</small></span>} id="navbar-dropdown" onClick={handleDropDownClick}>
+                  <NavDropdown.Item as={Link} to="/login">
+                    Login
+                  </NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to="/signup">
+                    Sign Up
+                  </NavDropdown.Item>
+                </NavDropdown>
+              )}
+              <Nav.Link as={Link} to="/cart">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="25"
+                  height="25"
+                  fill="currentColor"
+                  className="bi bi-bag"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z" />
+                </svg>
+              </Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
         </Navbar>
       </div>
     </header>

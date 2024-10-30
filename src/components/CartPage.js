@@ -3,6 +3,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { CartContext } from "../contexts/CartContext";
 import { UserContext } from "../contexts/UserContext";
+import { Link, useNavigate } from "react-router-dom";
 
 
 const CartPage = () => {
@@ -11,14 +12,16 @@ const CartPage = () => {
   const {cart, removeFromCart} = useContext(CartContext);
   const {isLoggedOn, user} = useContext(UserContext);
   const [coupon, setCoupon] = useState("");
+  const [contribution, setContribution] = useState(0);
   const [invalidCoupon, setInvalidCoupon] = useState(false);
+  const navigate = useNavigate();
 
   
 
   const handleApplyCoupon = () => {
     if (coupon === "SAVE10") {
       setInvalidCoupon(false);
-      const totalPrice = cart.reduce((acc, item) => acc + item.price, 0);
+      const totalPrice = contribution + cart.reduce((acc, item) => acc + item.price, 0);
       const discountedPrice = totalPrice * 0.9;
     } else {
       setInvalidCoupon(true);
@@ -30,16 +33,18 @@ const CartPage = () => {
       alert("please login to proceed to checkout");
       return;
     }
-    console.log("Need to handle payment");
+    else{
+      navigate("/makePayment", { state : { amount : totalPrice, payable: totalPrice } });
+    }
   }
 
   const handleCloseError = () => {
-    setInvalidCoupon(false);
+      setInvalidCoupon(false);
   };
 
   const handleRemoveFromCart = (item) => {
-      console.log("handelr " + item);
-      removeFromCart(item);
+    console.log("handelr " + item);
+    removeFromCart(item);
   }
 
   const getCountOfItem = (item) => {
@@ -53,7 +58,7 @@ const CartPage = () => {
   const height = (window.innerWidth < 768)? 200 : 450 + "px";
 
   // const totalPrice = cart.reduce((acc, item) => acc + item.price, 0);
-  const totalPrice = cart.reduce((acc, item) => acc + (item.price * getCountOfItem(item)), 0);
+  const totalPrice = ((contribution) + cart.reduce((acc, item) => acc + (item.price * getCountOfItem(item)), 0))/10;
 
   return (
     <div className="content-wrapper" style={{ backgroundColor: "#f8f9fa" }}>
@@ -102,28 +107,28 @@ const CartPage = () => {
                 <div className="col">Subtotal:</div>
                 <div className="col-auto">₹{totalPrice}</div>
               </div>
-              <div className="mb-3">
-                <div>
-                <div className="row">
-                  <div className="col-7" style={{paddingTop:"8px"}}>
-                <input
-                  type="text"
-                  className="form-control form-control-sm"
-                  placeholder="Enter coupon code"
-                  value={coupon}
-                  onChange={(e) => setCoupon(e.target.value)}
-                />
-                </div>
-                <div className="col-5" style={{alignItems:"end"}}>
-                <button
-                  className="btn btn-sm btn-secondary mt-2"
-                  onClick={handleApplyCoupon}
-                >
-                  Apply Coupon
-                </button>
-                </div>
-                </div>
-                </div>
+                <div className="mb-3">
+                  <div>
+                    <div className="row">
+                      <div className="col-7" style={{paddingTop:"8px"}}>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          placeholder="Enter coupon code"
+                          value={coupon}
+                          onChange={(e) => setCoupon(e.target.value)}
+                        />
+                      </div>
+                      <div className="col-5" style={{alignItems:"end"}}>
+                        <button
+                          className="btn btn-sm btn-secondary mt-2"
+                          onClick={handleApplyCoupon}
+                        >
+                          Apply Coupon
+                        </button>
+                      </div>
+                    </div>
+                  </div>
               </div>
               {invalidCoupon && (
                 <div
@@ -138,13 +143,28 @@ const CartPage = () => {
                   ></button>
                 </div>
               )}
-              <div className="row mb-3">
+             
+              {/* <div className="flex" style={{padding:"20px"}}> */}
+              <input
+                  type="number"
+                  className="form-control form-control-sm border border-success"
+                  min={1}
+                  placeholder="Contribute ₹"
+                  value={contribution}
+                  onChange={(e) => setContribution(e.target.value)}
+                />
+              {/* </div> */}
+
+              <div className="row mb-3" style={{paddingTop:"15px"}}>
                 <div className="col">Total:</div>
                 <div className="col-auto">₹{totalPrice}</div>
               </div>
-              <button className="btn btn-primary btn-block" onClick={handleCheckOut}>
-                Proceed to Checkout
-              </button>
+
+              <div className="flex" >
+                  <button className="btn btn-primary btn-block" onClick={handleCheckOut}>
+                    Proceed to Checkout
+                  </button>
+              </div>
             </div>
           </div>
         </div>

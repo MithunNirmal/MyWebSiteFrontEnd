@@ -3,11 +3,13 @@ import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
 import backgroundImage from "../files/bgm.jpg";
-import UrlContext from "../contexts/UrlContext";
+import { UrlContext } from "../contexts/UrlContext";
+import { CartContext } from "../contexts/CartContext";
 
 const LoginPage = () => {
   const {login, token, userName, isLoggedOn}  = useContext(UserContext);
-  const url = useContext(UrlContext);
+  const { server } = useContext(UrlContext);
+  const { handleCartLogin } = useContext(CartContext);
 
   const navigate = useNavigate();
 
@@ -45,7 +47,7 @@ const LoginPage = () => {
 
     if (valid) {
       console.log("Calling authenticate fetch now");
-      fetch(url.domain+"/api/v1/auth/authenticate", {
+      fetch(server +"/api/v1/auth/authenticate", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -54,34 +56,51 @@ const LoginPage = () => {
         body: JSON.stringify(formData),
       })
       .then((response) => {
-        if (response.status != 200) {
-          setErrors({ ...errors, password: "Incorrect password" });
-        } else if (response.status == 200) {
-          setErrors({
-            ...errors,
-            password: "",
-          });
-        } else {
-          setErrors({
-            ...errors,
-            password: "Some error!",
-          });
+        switch(response.status) {
+          case 200:
+            setErrors({
+              ...errors,
+              password: "",
+            });
+            return response.json();
+          case 404:
+            setErrors({
+              ...errors,
+              email: "This email is not registered",
+              password: ""
+            });
+            break;
+          case 401:
+            setErrors({
+              ...errors,
+              email : "",
+              password: "Incorrect password",
+            });
+            break;
+          default:
+            setErrors({
+              ...errors,
+              email: "Some error!",
+            });
+            alert("Some error occuured! Please try againg in sometime!")
         }
-        return response.json();
       })
       .then((data) => {
-        console.log(data);        
-        console.log(data.access_token);
-        login(true, data.user_name, data.access_token, data.user_id);
-        localStorage.setItem("userDetails", JSON.stringify({
-          isLoggedOn: true,
-          userName: data.user_name,
-          token: data.access_token,
-          userId: data.user_id,
-        }));
-        localStorage.setItem("jwt", data.access_token);
-        console.log("Login successful!");
-        navigate("/");
+        if(data) {
+          console.log(data);        
+          console.log(data.access_token);
+          login(true, data.user_name, data.access_token, data.user_id);
+          localStorage.setItem("userDetails", JSON.stringify({
+            isLoggedOn: true,
+            userName: data.user_name,
+            token: data.access_token,
+            userId: data.user_id,
+          }));
+          localStorage.setItem("jwt", data.access_token);
+          handleCartLogin(data.user_id);
+          console.log("Login successful!");
+          navigate("/");
+        }
       })
       .catch((error) => {
         // setErrors({

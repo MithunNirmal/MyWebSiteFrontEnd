@@ -1,13 +1,15 @@
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import backgroundImage from "../files/bgm.jpg";
-import UrlContext from "../contexts/UrlContext";
+import { UrlContext } from "../contexts/UrlContext";
 import { UserContext } from "../contexts/UserContext";
+import { CartContext } from "../contexts/CartContext";
 
 const Signup = () => {
-  const url = useContext(UrlContext);
+  const { server } = useContext(UrlContext);
   const navigate = useNavigate();
   const {login}  = useContext(UserContext);
+  const { handleCartLogin } = useContext(CartContext);
  
   const [formData, setFormData] = useState({
     firstName:"",
@@ -94,7 +96,7 @@ const Signup = () => {
 
     if (valid) {
       // Perform signup action
-      fetch(url.domain+"/api/v1/auth/register", {
+      fetch(server +"/api/v1/auth/register", {
         method : "POST",
         headers: {
           Accept: "application/json",
@@ -121,6 +123,7 @@ const Signup = () => {
             userId: data.user_id,
           }));
           localStorage.setItem("jwt", data.access_token);
+          handleCartLogin(data.user_id);
           console.log("Login successful!");
           navigate("/");
       })

@@ -1,6 +1,7 @@
 import React from "react";
 import backgroundImage from "../files/bgm.jpg";
 import "../css/Home.css";
+import AudioPlayer from "./AudioPlayer";
 
 const Home = () => {
   return (
@@ -33,6 +34,13 @@ const Home = () => {
           <iframe src="https://www.youtube.com/embed?listType=playlist&list=UUW65BFIRS_e38gdC8dPHt6A"></iframe>
         </div>
         </center>
+        <div>
+          
+        <div>
+            <h1>Google Drive Audio Streaming</h1>
+            <AudioPlayer fileId="18UWUGvUNsvj1BsC5Gg7sB1Bgw_0NCZ5E" />
+        </div>
+        </div>
       </div>
       </div>
     </div>

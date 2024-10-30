@@ -1,19 +1,20 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import UrlContext from "./UrlContext";
+import { UrlContext } from "./UrlContext";
 import { UserContext } from "./UserContext";
 
 const CartContext = React.createContext(null);
 
 const CartProvider = ({ children }) => {
         // const localCart = JSON.parse(localStorage.getItem("cart") || []);
-        const { url } = useContext(UrlContext);
+        const { server } = useContext(UrlContext);
+        const serv = "http://172.20.10.2:8080";
 		const [cart, setCart] = useState([]);
         const { isLoggedOn, userId } = useContext(UserContext);
         let firstRender = true;
         let localCart; 
         useEffect(() => {
             try {
-            localCart = JSON.parse(localStorage.getItem("cart") || []);
+                localCart = JSON.parse(localStorage.getItem("cart") || []);
             }
             catch (error) {
                 console.log(error);
@@ -22,7 +23,7 @@ const CartProvider = ({ children }) => {
 
         useEffect(() => {
             if(isLoggedOn){
-                fetch(`http://192.168.1.100:8080/api/v1/cart?userId=${userId}`, {
+                fetch(`${serv}/api/v1/cart/add?userId=${userId}`, { //`http://192.168.1.100:8080 
                     method: "POST",
                     headers: {
                         Authorization: "Bearer " + localStorage.getItem("jwt"),
@@ -34,7 +35,35 @@ const CartProvider = ({ children }) => {
                 .catch((error) => {console.error(error)});
             }
 
-        }, [isLoggedOn, cart]);
+        }, [cart]);
+
+        const handleCartLogin = (user_id) => {
+            console.log("handleCartLogin Called");
+        //    if(cart && cart != [] && isLoggedOn){
+
+                console.log("handleCartLogin Ulla vandhuchaaa");
+                fetch(`${serv}/api/v1/cart/sync?userId=${user_id}`, { //`http://192.168.1.100:8080 
+                    method: "POST",
+                    headers: {
+                        Authorization: "Bearer " + localStorage.getItem("jwt"),
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(cart),
+                })
+                .then((response) => {
+                    console.log(response.status)
+                    if(response.status == 200) {
+                        return response.stringify();   
+                    }
+                })
+                .then((data) => {
+                    console.log(data);
+                    localStorage.setItem("cart", data);
+                })
+                .catch((error) => {console.error(error)});
+
+        //    }
+        }
 
         const addToCart = (item) => {
             if(!cart.find(cartItem => item.productId === cartItem.productId)){
@@ -104,9 +133,11 @@ const CartProvider = ({ children }) => {
         }, [cart]);
 
 		return (
-			<CartContext.Provider value={{cart, addToCart, removeFromCart}}>
-				{children}
-			</CartContext.Provider>
+            <UrlContext.Provider value={{server}}>
+                <CartContext.Provider value={{cart, addToCart, removeFromCart, handleCartLogin}}>
+                    {children}
+                </CartContext.Provider>
+            </UrlContext.Provider>
 		)
 };
   

@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import backgroundImage from "../files/bgm.jpg";
-import UrlContext from "../contexts/UrlContext";
+import { UrlContext } from "../contexts/UrlContext";
 import { CartContext } from "../contexts/CartContext";
 
 const Album = () => {
   const { id } = useParams(); // Get the ID from the route params
-  const url = useContext(UrlContext);
+  const { server } = useContext(UrlContext);
   const {cart, addToCart} = useContext(CartContext);
 
   const [albumData, setAlbumData] = useState({
@@ -35,7 +35,7 @@ const Album = () => {
   useEffect(() => {
     const fetchAlbumData = async () => {
       try {
-        const response = await fetch(`${url.domain}/api/v1/album/public/${id}`); // Replace 'your-api-endpoint' with your actual API endpoint
+        const response = await fetch(`${server}/api/v1/album/public/${id}`); // Replace 'your-api-endpoint' with your actual API endpoint
         if (response.ok) {
           const data = await response.json();
           setAlbumData(data);
